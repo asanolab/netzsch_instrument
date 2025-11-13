@@ -81,7 +81,7 @@ ros = roslibpy.Ros(host=client_ip, port=9090)
 ros.run()
 
 # Service server
-service = roslibpy.Service(ros, '/netzsch_measurement_server', 'auto_tma/NETZSCH_Measurement')
+service = roslibpy.Service(ros, '/netzsch_measurement_server', 'netzsch_ros/NETZSCH_Measurement')
 service.advertise(handle_netzsch_measurement)
 
 print("Service '/netzsch_measurement_server' advertised. Waiting for requests...")

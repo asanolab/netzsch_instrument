@@ -1,5 +1,5 @@
 method:
-  file_name: "test.ngb-s-dil"
+  file_name: "auto_tma.ngb-s-dil"
   param:
     lab: "room_A"
     project: "sample_project"
