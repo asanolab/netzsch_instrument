@@ -1,0 +1,5 @@
+uint32 sample_id
+float32 sample_thickness
+---
+bool success
+string message

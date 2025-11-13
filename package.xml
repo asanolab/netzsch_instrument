@@ -1,0 +1,19 @@
+<package format="2">
+  <name>netzsch_ros</name>
+  <version>0.1.0</version>
+  <description> NETZSCH software controller using ROS </description>
+
+  <maintainer email="yuki.asano3206@gmail.com">Yuki Asano</maintainer>
+  <author email="yuki.asano3206@gmail.com">Yuki Asano</author>
+
+  <license>BSD 2-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>rosbridge_suite</depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+
+</package>
