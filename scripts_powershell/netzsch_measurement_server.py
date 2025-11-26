@@ -30,51 +30,79 @@ except Exception as e:
 
 
 def handle_netzsch_measurement(request, response):
-    print(f"Received measurhement request: {request}")
+    print(f"[roslibpy] Received measurement request: {request}")
 
-    # measurement
-    if request['sample_id'] == 0:
-        print('starting software')
+    # start software
+    print('[roslibpy] starting software')
+    response['message'] = 'starting software'
+    try:
         tma_gui_controller.start_software()
-        response['message'] = 'starting software'
-    else:
-        print('skip starting software')
+    except Exception as e:
+        print(e)
+        response['success'] = False
+        return False
 
-    print('setting method')
-    tma_gui_controller.set_method(
-        method_file_name = method['file_name']
-    )
+    # set method
+    print('[roslibpy] setting method')
     response['message'] = 'setting method'
+    try:
+        tma_gui_controller.set_method(
+            method_file_name = method['file_name']
+        )
+    except Exception as e:
+        print(e)
+        response['success'] = False
+        return False
 
-    print('inputting parameters')
-    tma_gui_controller.input_parameters(
-        lab              = method_p['lab'],
-        project          = method_p['project'],
-        measurer         = method_p['measurer'],
-        sample_id        = request['sample_id'],
-        sample_name      = method_p['sample_name'],
-        sample_length    = method_p['sample_length'],
-        sample_width     = method_p['sample_width'],
-        sample_thickness = request['sample_thickness'],
-        sample_material  = method_p['sample_material'],
-        result_file_name = method_p['result_file_name']
-    )
+    # input method
+    print('[roslibpy] inputting parameters')
     response['message'] = 'inputting parameters'
+    try:
+        tma_gui_controller.input_parameters(
+            lab              = method_p['lab'],
+            project          = method_p['project'],
+            measurer         = method_p['measurer'],
+            sample_id        = request['sample_id'],
+            sample_name      = method_p['sample_name'],
+            sample_length    = method_p['sample_length'],
+            sample_width     = method_p['sample_width'],
+            sample_thickness = request['sample_thickness'],
+            sample_material  = method_p['sample_material'],
+            result_file_name = method_p['result_file_name']
+        )
+    except Exception as e:
+        print(e)
+        response['success'] = False
+        return False
 
-    print('measuring sample')
-    tma_gui_controller.measure()
+    # measure sample
+    print('[roslibpy] measuring sample')
     response['message'] = 'measuring sample'
+    try:
+        tma_gui_controller.measure()
+    except Exception as e:
+        print(e)
+        response['success'] = False
+        return False
 
-    print('closing software')
-    tma_gui_controller.close_software()
+    # close software
+    print('[roslibpy] closing software')
     response['message'] = 'closing software'
+    try:
+        tma_gui_controller.close_software()
+    except Exception as e:
+        print(e)
+        response['success'] = False
+        return False
 
-    time.sleep(1.0)
-
+    # return
     response['success'] = True
     response['message'] = 'measurement succeeded'
-    print("Measurement succeeded")
-    return True
+    print("[roslibpy] measurement succeeded")
+    print("[roslibpy] waiting for next service call")
+
+    return True  # must return True to roslibpy when success
+
 
 # ros
 ros = roslibpy.Ros(host=client_ip, port=9090)
@@ -84,15 +112,15 @@ ros.run()
 service = roslibpy.Service(ros, '/netzsch_measurement_server', 'netzsch_ros/NETZSCH_Measurement')
 service.advertise(handle_netzsch_measurement)
 
-print("Service '/netzsch_measurement_server' advertised. Waiting for requests...")
+print("[roslibpy] Service '/netzsch_measurement_server' advertised. Waiting for requests...")
 
 
 try:
     while ros.is_connected:
         time.sleep(0.1)  # continue to connect
 except KeyboardInterrupt:
-    print('Interrupted, shutting down servece...')
+    print('[roslibpy] Interrupted, shutting down service...')
 finally:
     service.unadvertise()
     ros.terminate()
-    print('Disconnected from ROS.')
+    print('[roslibpy] Disconnected from ROS.')

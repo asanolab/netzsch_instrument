@@ -20,7 +20,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         )
 
         # window name
-        self.window_name_main     = self.window_name
+        self.window_name_main_org = self.window_name  # original name at execution
+        self.window_name_main     = self.window_name  # for updated name
         self.window_name_analysis = ''  # init with file name later
         self.methods_dir = 'C:\\NETZSCH\\Proteus80\\_Records\\Methods'
 
@@ -48,11 +49,11 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         print('self.assets_dir:', self.assets_dir)
 
         # status
-        self.TMA_measure_status = 'waiting'  # waiting, setting, measuring, completed
+        self.NETZSCH_measurement_status = 'waiting'  # waiting, setting, measuring, completed
 
         
-    def get_TMA_measure_status(self):
-        return self.TMA_measure_status
+    def get_NETZSCH_measurement_status(self):
+        return self.NETZSCH_measurement_status
 
 
     # 行程順
@@ -64,7 +65,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     def start_software(self):
         self.execute_application()  # wait exe_sleep time
         self.is_window_main = True
-        self.resize_window(self.window_name_main, width=600, height=800, x=0, y=0)  # resize window
+        self.resize_window(self.window_name_main_org, width=600, height=800, x=0, y=0)  # resize window
         time.sleep(12)  # wait 
         
         # find セットポイントwindow and click 'いいえ' 
@@ -73,8 +74,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
 
     def set_method(self, method_file_name='test.ngb-s-dil'):
         # initial process
-        self.TMA_measure_status = 'setting'
-        self.make_window_active(self.window_name_main)
+        self.NETZSCH_measurement_status = 'setting'
+        self.make_window_active(self.window_name_main_org)
         self.click_by_img(self.img_path_method)   # click 'メソッド'
         self.click_by_pos(0, 100, relative=1)  # click 'メソッドを開く'
         str_open_method = 'メソッドを開く. ルート: ' + self.methods_dir
@@ -96,6 +97,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                          sample_thickness = 0.3,  # [mm]
                          sample_material  = 'polyethylene',
                          result_file_name = 'test_result'):
+        result_file_name_w_id = result_file_name + '_' + str(sample_id)
         
         # input parameters
         #前回の測定の有無で開始点が変わるので注意.
@@ -127,7 +129,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         pag.press('tab')
         # left bottom
         self.click_by_img(self.img_path_select)
-        pag.write(result_file_name)
+        pag.write(result_file_name_w_id)
         time.sleep(1)  # wait tuning
         self.click_by_img(self.img_path_save)
 
@@ -143,13 +145,13 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.click_by_img(self.img_path_OK)
 
         # update name of main window
-        self.window_name_main = self.window_name_main + ' - ' + result_file_name + '.ngb-sl8'
-        self.window_name_analysis = 'NETZSCH Proteus Thermal Analysis (Automatic instance) 8.0.3 - [' + result_file_name + '.ngb-ol8]'
+        self.window_name_main = self.window_name_main_org + ' - ' + result_file_name_w_id + '.ngb-sl8'
+        self.window_name_analysis = 'NETZSCH Proteus Thermal Analysis (Automatic instance) 8.0.3 - [' + result_file_name_w_id + '.ngb-ol8]'
         print('window name updated to: %s'% self.window_name_main)
 
 
     def measure(self):
-        self.TMA_measure_status = 'measuring'
+        self.NETZSCH_measurement_status = 'measuring'
 
         # 測定アイコンのクリック
         self.click_by_img(self.img_path_start_measure, sleep_time=3)  # must wait for a while (2s is short)
@@ -159,9 +161,9 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.click_by_img(self.img_path_standby_TMAsoft)
         # memo:
         # - 装置にエラーがあると測定を開始できない
-        # - 例としては,
-        # - ガスの流量不足. 
-        # - サンプルに負荷がかかっていない -> Delta L: UNF
+        # - 例:
+        #   - ガスの流量不足.
+        #   - サンプルに負荷がかかっていない -> Delta L: UNF
 
         # 「開始」のクリック
         while True:
@@ -185,25 +187,23 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         # - OCRで残り時間を抽出
 
         # NGB測定 windowで測定完了をチェック
-        while True:
+        while self.is_window_ngb:
             try:
                 self.make_window_active('NGB測定')
                 time.sleep(3)
                 self.click_by_img(self.img_path_finish_measure_OK)
-                print('NGB window is closed')
-                self.is_window_ngb = False
             except KeyboardInterrupt:
                 break
             except:
-                print('Under measurement. Check again in 10 seconds')
+                print('Under measurement(NGB window is not found). Check again in 10 seconds.')
                 time.sleep(10)
             else:
+                print('NGB window is closed')
                 print('TMA measurement has finished')
+                self.is_window_ngb = False
                 time.sleep(1)
-                break
 
-
-        self.TMA_measure_status = 'completed'
+        self.NETZSCH_measurement_status = 'completed'
         
 
     # 終了処理
@@ -287,7 +287,6 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 time.sleep(1)
 
         print('End of this measurement')
-        print('waiting for next measurement')
 
 
     def all_process(self):
