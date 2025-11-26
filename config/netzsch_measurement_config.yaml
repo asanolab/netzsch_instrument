@@ -1,3 +1,6 @@
+ros_client:
+  ip: "192.168.0.21"  # manager PC
+  port: 9090
 method:
   file_name: "auto_tma.ngb-s-dil"
   param:

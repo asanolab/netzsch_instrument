@@ -9,7 +9,6 @@ import yaml
 from gui_control_netzsch_measurement import GUIControl_NETZSCH_Measurement
 
 tma_gui_controller = GUIControl_NETZSCH_Measurement()
-client_ip = '192.168.0.21'  # manager desktop PC
 
 # load exp config
 if len(sys.argv) < 2:
@@ -24,6 +23,8 @@ try:
         conf = yaml.safe_load(f)
         method = conf['method']
         method_p = conf['method']['param']
+        client_ip = conf['ros_client']['ip']
+        client_port = conf['ros_client']['port']
 except Exception as e:
     print(f"fail to load YAML file: {e}")
     sys.exit(1)
@@ -105,7 +106,7 @@ def handle_netzsch_measurement(request, response):
 
 
 # ros
-ros = roslibpy.Ros(host=client_ip, port=9090)
+ros = roslibpy.Ros(host=client_ip, port=client_port)
 ros.run()
 
 # Service server
