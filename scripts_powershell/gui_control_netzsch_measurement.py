@@ -4,7 +4,9 @@
 import os
 import pyautogui as pag
 import time
+from pathlib import Path
 from labauto.gui_control.gui_control_windows import GUIControlWindows
+
 
 # memo
 # - soft名: NETZSCH Measurement
@@ -44,7 +46,9 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.is_window_analysis = False
         
         # path
-        self.assets_dir = r'\\wsl$\Ubuntu\home\utokyo-user\catkin_ws\src\netzsch_ros\assets'  # raw文字
+        self.script_dir = Path(__file__).parent.resolve()
+        self.pkg_dir = Path(self.script_dir).parent.resolve()
+        self.assets_dir = os.path.join(self.pkg_dir, 'assets')
         self.img_path_method            = os.path.join(self.assets_dir, 'icon_method.png')
         self.img_path_select_method     = os.path.join(self.assets_dir, 'OpenMethod_selected_method_name.png')  # must take screenshot of the method to be used
         self.img_path_select            = os.path.join(self.assets_dir, 'Method_select.png')
