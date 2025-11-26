@@ -16,7 +16,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
             exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}            
-            exe_sleep = 3
+            exe_sleep = 4  # 3 is sometimes not enough
         )
 
         # window name
@@ -25,6 +25,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.methods_dir = 'C:\\NETZSCH\\Proteus80\\_Records\\Methods'
 
         # flag
+        self.is_window_main = False
         self.is_window_ngb = False
         self.is_window_event_info = False
         self.is_window_analysis = False
@@ -42,7 +43,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.img_path_start_TMAsoft     = os.path.join(self.assets_dir, 'Adjustment_start.png')
         self.img_path_finish_measure_OK = os.path.join(self.assets_dir, 'NGB_OK.png')
         self.img_path_event_info_OK     = os.path.join(self.assets_dir, 'EventInfo_OK.png')
-        self.img_path_main_window_close = os.path.join(self.assets_dir, 'main_window_close.png')
+        self.img_path_analysis_window_close = os.path.join(self.assets_dir, 'analysis_window_close.png')
         self.img_path_NGB_No            = os.path.join(self.assets_dir, 'NGB_No.png')
         print('self.assets_dir:', self.assets_dir)
 
@@ -62,6 +63,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     # 終わると, 測定データ(csvなど)は自動で保存される. 解析ソフトが起動する.        
     def start_software(self):
         self.execute_application()  # wait exe_sleep time
+        self.is_window_main = True
         self.resize_window(self.window_name_main, width=600, height=800, x=0, y=0)  # resize window
         time.sleep(12)  # wait 
         
@@ -179,8 +181,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 self.is_window_analysis = True
                 break
 
-        # Todo below
-        # OCRで残り時間を抽出
+        # Todo:
+        # - OCRで残り時間を抽出
 
         # NGB測定 windowで測定完了をチェック
         while True:
@@ -197,6 +199,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 time.sleep(10)
             else:
                 print('TMA measurement has finished')
+                time.sleep(1)
                 break
 
 
@@ -204,41 +207,84 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         
 
     # 終了処理
-    # todo
-    # - 処理が不安定なので以下は場合によってコメントアウト
-    # - 要PCのスペックup
-    # - 終了後は手動で各windowをcloseする
     def close_software(self):
-        # NGB測定画面close
-        if self.is_window_ngb:
-            self.make_window_active('NGB測定')
-            self.click_by_img(self.img_path_NGB_No)
-            self.is_window_ngb = False
-        else:
-            print('No NGB window')
-
         # イベント情報window close
-        if self.is_window_event_info:
-            self.make_window_active('イベント情報')
-            self.click_by_img(self.img_path_event_info_OK)
-            self.is_window_event_info = False
-        else:
-            print('No event info window')
+        while self.is_window_event_info:
+            try:
+                print('Closing event_info window')
+                self.make_window_active('イベント情報')
+                time.sleep(1)
+                self.click_by_img(self.img_path_event_info_OK)
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
+                print('event_info is not found. Check again in 2 seconds.')
+                time.sleep(2)
+            else:
+                print('event_info windows is closed')
+                self.is_window_event_info = False
+                time.sleep(1)
 
         # main画面close
-        #self.make_window_active(window_name_main_after_setting)
-        self.make_window_active(self.window_name_main)
-        self.click_by_img(self.img_path_main_window_close)
+        while self.is_window_main:
+            try:
+                print('Closing main window')
+                self.make_window_active(self.window_name_main)
+                time.sleep(1)
+                self.close_active_window()
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
+                print('main window is not found. Check again in 2 seconds.')
+                time.sleep(2)
+            else:
+                print('main windows is closed')
+                self.is_window_main = False
+                self.is_window_ngb = True  # main windowを閉じたときに NGB測定画面が出る
+                time.sleep(1)
+
+        # NGB測定 close
+        while self.is_window_ngb:
+            try:
+                print('Closing NGB window')
+                self.make_window_active('NGB測定')
+                time.sleep(1)
+                self.click_by_img(self.img_path_NGB_No)
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
+                print('NGB window is not found. Check again in 2 seconds.')
+                time.sleep(2)
+            else:
+                print('NGB window is closed')
+                self.is_window_ngb = False
+                time.sleep(1)
 
         # analysis soft close
-        # todo: 既存のファイルがあると#nで増分していくので毎回フォルダを作る？
-        if self.is_window_analysis:
-            self.make_window_active(self.window_name_analysis)
-            self.click_by_img(self.img_path_main_window_close)  #測定ソフトimgの使いまわし
-            self.is_window_analysis = False
-        else:
-            print('No analysis window')
+        # memo & todo:
+        # - window名が取得できればそこからcloseしたい.
+        # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
+        while self.is_window_analysis:
+            try:
+                print('Closing analysis window')
+                self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでこれでも問題ない.
 
+                #self.make_window_active(self.window_name_analysis)
+                #time.sleep(1)
+                #self.close_active_window()
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(e)
+                print('Analysis window is not found. Check again in 2 seconds.')
+                time.sleep(2)
+            else:
+                print('Analysis windows is closed')
+                self.is_window_analysis = False
+                time.sleep(1)
 
         print('End of this measurement')
         print('waiting for next measurement')
