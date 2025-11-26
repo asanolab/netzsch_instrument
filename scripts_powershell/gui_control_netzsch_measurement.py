@@ -8,8 +8,20 @@ from labauto.gui_control.gui_control_windows import GUIControlWindows
 
 # memo
 # - soft名: NETZSCH Measurement
-# - input_parameterするとmain windowの名前が変わる. 途中でエラーになったときに困る. 毎回ソフトを起動しなおすのがよい?
-#
+# - input_parameterするとmain windowの名前が変わる. 途中でエラーになったときに困るので, 毎回ソフトを起動しなおす.
+# - 行程順
+#   - start_software(): soft起動
+#   - set_method():
+#     - メソッド -> メソッドを開く -> メソッドを選択(test.ngb-s-dilなど) -> 開く
+#   - input_parameters():
+#     - ID, 名前,　長さ, 幅, 厚み, 試料の材質, ファイル名を入力 -> OK
+#   - measure():
+#     - 測定の開始(緑の三角アイコン) -> スタンバイの開始 -> 開始 -> 測定終了を待つ
+#     - 測定が終わると, データ(csvなど)が保存される. 解析ソフトが起動する.
+#   - close_software():
+#     - 各種windowを閉じる
+
+
 class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     def __init__(self):
         super().__init__(
@@ -56,12 +68,6 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         return self.NETZSCH_measurement_status
 
 
-    # 行程順
-    # - soft起動
-    # - 初期設定(メソッドを開く): メソッド -> メソッドを開く -> メソッドを選択(test.ngb-s-dilなど) -> 開く
-    # - 設定定義を入力: ID, 名前,　長さ, 幅, 厚み, 試料の材質, ファイル名を入力 -> OK
-    # - 測定(別window): 測定の開始(緑の三角アイコン) -> スタンバイの開始 -> 開始 -> 測定終了を待つ
-    # 終わると, 測定データ(csvなど)は自動で保存される. 解析ソフトが起動する.        
     def start_software(self):
         self.execute_application()  # wait exe_sleep time
         self.is_window_main = True
@@ -264,17 +270,16 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 time.sleep(1)
 
         # analysis soft close
-        # memo & todo:
-        # - window名が取得できればそこからcloseしたい.
-        # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
         while self.is_window_analysis:
             try:
                 print('Closing analysis window')
-                self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでこれでも問題ない.
-
+                # memo & todo:
+                # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
+                # - imgからだと誤認識があるので, window名が取得できるなら,そこからcloseできたほうがよい.
                 #self.make_window_active(self.window_name_analysis)
                 #time.sleep(1)
                 #self.close_active_window()
+                self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでimgからでも誤認識が起きにくく,ひとまず問題ない.
             except KeyboardInterrupt:
                 break
             except Exception as e:
