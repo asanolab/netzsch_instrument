@@ -184,22 +184,23 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         #   - サンプルに負荷がかかっていない -> Delta L: UNF
 
         # 「開始」のクリック
-        while True:
-            try:
-                self.click_by_img(self.img_path_start_TMAsoft)
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                print(e)
-                print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft)
-                time.sleep(10)
-            else:
-                print('TMA measurement has started')
-                #測定完了後は, main画面に加えて, NGB測定, イベント情報, 分析ソフトのwindowが立ち上がる.
-                self.is_window_ngb = True
-                self.is_window_event_info = True
-                self.is_window_analysis = True
-                break
+        try:
+            while True:
+                try:
+                    self.click_by_img(self.img_path_start_TMAsoft)
+                except Exception as e:
+                    print(e)
+                    print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft)
+                    time.sleep(10)
+                else:
+                    print('TMA measurement has started')
+                    #測定完了後は, main画面に加えて, NGB測定, イベント情報, 分析ソフトのwindowが立ち上がる.
+                    self.is_window_ngb = True
+                    self.is_window_event_info = True
+                    self.is_window_analysis = True
+                    break
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         # OCR setting
         ss_path = os.path.join(self.tmp_dir, 'tmp_ss.png')
@@ -225,21 +226,22 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         time.sleep(seconds)
 
         # NGB測定 windowで測定完了をチェック
-        while self.is_window_ngb:
-            try:
-                self.make_window_active('NGB測定')
-                time.sleep(3)
-                self.click_by_img(self.img_path_finish_measure_OK)
-            except KeyboardInterrupt:
-                break
-            except:
-                print('Under measurement(NGB window is not found). Check again in 2 seconds.')
-                time.sleep(2)
-            else:
-                print('NGB window is closed')
-                print('TMA measurement has finished')
-                self.is_window_ngb = False
-                time.sleep(1)
+        try:
+            while self.is_window_ngb:
+                try:
+                    self.make_window_active('NGB測定')
+                    time.sleep(3)
+                    self.click_by_img(self.img_path_finish_measure_OK)
+                except:
+                    print('Under measurement(NGB window is not found). Check again in 2 seconds.')
+                    time.sleep(2)
+                else:
+                    print('NGB window is closed')
+                    print('TMA measurement has finished')
+                    self.is_window_ngb = False
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         self.NETZSCH_measurement_status = 'completed'
         
@@ -247,81 +249,85 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     # 終了処理
     def close_software(self):
         # イベント情報window close
-        while self.is_window_event_info:
-            try:
-                print('Closing event_info window')
-                self.make_window_active('イベント情報')
-                time.sleep(1)
-                self.click_by_img(self.img_path_event_info_OK)
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                print(e)
-                print('event_info is not found. Check again in 2 seconds.')
-                time.sleep(2)
-            else:
-                print('event_info windows is closed')
-                self.is_window_event_info = False
-                time.sleep(1)
+        try:
+            while self.is_window_event_info:
+                try:
+                    print('Closing event_info window')
+                    self.make_window_active('イベント情報')
+                    time.sleep(1)
+                    self.click_by_img(self.img_path_event_info_OK)
+                except Exception as e:
+                    print(e)
+                    print('event_info is not found. Check again in 2 seconds.')
+                    time.sleep(2)
+                else:
+                    print('event_info windows is closed')
+                    self.is_window_event_info = False
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         # main画面close
-        while self.is_window_main:
-            try:
-                print('Closing main window')
-                self.make_window_active(self.window_name_main)
-                time.sleep(1)
-                self.close_active_window()
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                print(e)
-                print('main window is not found. Check again in 2 seconds.')
-                time.sleep(2)
-            else:
-                print('main windows is closed')
-                self.is_window_main = False
-                self.is_window_ngb = True  # main windowを閉じたときに NGB測定画面が出る
-                time.sleep(1)
+        try:
+            while self.is_window_main:
+                try:
+                    print('Closing main window')
+                    self.make_window_active(self.window_name_main)
+                    time.sleep(1)
+                    self.close_active_window()
+                except Exception as e:
+                    print(e)
+                    print('main window is not found. Check again in 2 seconds.')
+                    time.sleep(2)
+                else:
+                    print('main windows is closed')
+                    self.is_window_main = False
+                    self.is_window_ngb = True  # main windowを閉じたときに NGB測定画面が出る
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         # NGB測定 close
-        while self.is_window_ngb:
-            try:
-                print('Closing NGB window')
-                self.make_window_active('NGB測定')
-                time.sleep(1)
-                self.click_by_img(self.img_path_NGB_No)
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                print(e)
-                print('NGB window is not found. Check again in 2 seconds.')
-                time.sleep(2)
-            else:
-                print('NGB window is closed')
-                self.is_window_ngb = False
-                time.sleep(1)
+        try:
+            while self.is_window_ngb:
+                try:
+                    print('Closing NGB window')
+                    self.make_window_active('NGB測定')
+                    time.sleep(1)
+                    self.click_by_img(self.img_path_NGB_No)
+                except Exception as e:
+                    print(e)
+                    print('NGB window is not found. Check again in 2 seconds.')
+                    time.sleep(2)
+                else:
+                    print('NGB window is closed')
+                    self.is_window_ngb = False
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         # analysis soft close
-        while self.is_window_analysis:
-            try:
-                print('Closing analysis window')
-                # memo & todo:
-                # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
-                # - imgからだと誤認識があるので, window名が取得できるなら,そこからcloseできたほうがよい.
-                #self.make_window_active(self.window_name_analysis)
-                #time.sleep(1)
-                #self.close_active_window()
-                self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでimgからでも誤認識が起きにくく,ひとまず問題ない.
-            except KeyboardInterrupt:
-                break
-            except Exception as e:
-                print(e)
-                print('Analysis window is not found. Check again in 2 seconds.')
-                time.sleep(2)
-            else:
-                print('Analysis windows is closed')
-                self.is_window_analysis = False
-                time.sleep(1)
+        try:
+            while self.is_window_analysis:
+                try:
+                    print('Closing analysis window')
+                    # memo & todo:
+                    # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
+                    # - imgからだと誤認識があるので, window名が取得できるなら,そこからcloseできたほうがよい.
+                    #self.make_window_active(self.window_name_analysis)
+                    #time.sleep(1)
+                    #self.close_active_window()
+                    self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでimgからでも誤認識が起きにくく,ひとまず問題ない.
+                except Exception as e:
+                    print(e)
+                    print('Analysis window is not found. Check again in 2 seconds.')
+                    time.sleep(2)
+                else:
+                    print('Analysis windows is closed')
+                    self.is_window_analysis = False
+                    time.sleep(1)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
 
         print('End of this measurement')
 
