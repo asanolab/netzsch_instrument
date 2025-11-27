@@ -202,24 +202,16 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 break
 
         # OCR setting
-        self.make_window_active('測定残り時間')
-        x = self.active_window_x1
-        y = self.active_window_y1
-        w = self.active_window_width
-        h = self.active_window_length
-        region = (x, y, w, h)  # x,y,w,h
-        #self.tmp_dir = tempfile.gettempdir()
-        img_path = os.path.join(self.tmp_dir, 'tmp_ss.png')
-        print('screenshot is saved to: %s'% img_path)
+        ss_path = os.path.join(self.tmp_dir, 'tmp_ss.png')
+        print('screenshot is saved to: %s'% ss_path)
 
         # OCR
         seconds = None
         try:
             while seconds is None:
                 try:
-                    screenshot = pag.screenshot(region=region)
-                    screenshot.save(img_path)
-                    seconds = self.extract_remaining_time(img_path, debug=True)
+                    self.screenshot_window('測定残り時間', ss_path)
+                    seconds = self.extract_remaining_time(ss_path, debug=True)
                     time.sleep(2)
                 except Exception as e:
                     print(e)
@@ -370,7 +362,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         if match:
             h, m, s = map(int, match.groups())
             seconds = h * 3600 + m * 60 + s
-            print('Extract seconds: %s'% seconds)
+            print('seconds: %s'% seconds)
             return seconds
 
         return None
