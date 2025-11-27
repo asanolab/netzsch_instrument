@@ -1,18 +1,37 @@
 # netzsch_ros
-
-## install
-install labauto on WSL
+## Configuration
+- Server PC (Windows)
+  - Measurement software (GUI)
+- Client PC (Ubuntu)
+  - Manage auto_exp
+     
+## Install
+Server PC
 ```
+# install labauto
+[wsl]
 cd \\wsl.localhost\Ubuntu\home\utokyo-user\catkin_ws\src\labauto
 python3 -m pip install -e .
 ```
 
-client PC (Ubuntuなど)
+Install tesseract OCR on Windows
+- Download installer (exe)
+  - https://github.com/UB-Mannheim/tesseract/wiki
+  - Specify installed application path(exe) in the program
+- Install python rapper
+  ```
+  [powershell]
+  python3 -m pip install pytesseract
+  ```
+
+
+## Usage
+client PC
 ```
 roslaunch rosbridge_server rosbridge_websocket.launch  # roslibでの通信に必要
 ```
 
-gui PC (windows)
+server PC
 ```
 [terminal1] wsl
 roscore
