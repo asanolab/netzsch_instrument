@@ -55,8 +55,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         # path
         self.tmp_dir = tempfile.gettempdir()  # screenshot img for OCR
         self.script_dir = Path(__file__).parent.resolve()
-        self.pkg_dir = Path(self.script_dir).parent.resolve()
-        self.assets_dir = os.path.join(self.pkg_dir, 'assets')
+        self.assets_dir = os.path.join(self.script_dir, 'assets')
         self.img_path_method            = os.path.join(self.assets_dir, 'icon_method.png')
         self.img_path_select_method     = os.path.join(self.assets_dir, 'OpenMethod_selected_method_name.png')  # must take screenshot of the method to be used
         self.img_path_select            = os.path.join(self.assets_dir, 'Method_select.png')

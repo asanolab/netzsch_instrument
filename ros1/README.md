@@ -1,4 +1,4 @@
-# netzsch_ros
+# netzsch_instrument_ros1
 ## Configuration
 - Server PC (Windows)
   - Measurement software (GUI)

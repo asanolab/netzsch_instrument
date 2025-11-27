@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(netzsch_ros)
+project(netzsch_instrument_ros1)
 
 #catkin_python_setup()
 
@@ -26,7 +26,7 @@ catkin_package(
 
 catkin_install_python(
   PROGRAMS
-    scripts_powershell/netzsch_measurement_server.py
+    scripts/netzsch_measurement_server.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

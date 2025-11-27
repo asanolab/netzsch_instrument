@@ -6,7 +6,7 @@ import roslibpy
 import sys
 import time
 import yaml
-from gui_control_netzsch_measurement import GUIControl_NETZSCH_Measurement
+from netzsch_instrument.gui_control_netzsch_measurement import GUIControl_NETZSCH_Measurement
 
 tma_gui_controller = GUIControl_NETZSCH_Measurement()
 
