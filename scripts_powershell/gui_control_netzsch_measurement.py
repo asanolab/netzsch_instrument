@@ -6,9 +6,13 @@ import os
 import pyautogui as pag
 import pytesseract
 import re
+import tempfile
 import time
 from pathlib import Path
 from labauto.gui_control.gui_control_windows import GUIControlWindows
+
+# tesseract OCRのpathを指定
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 
 # memo
@@ -33,7 +37,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
             exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}            
-            exe_sleep = 4  # 3 is sometimes not enough
+            exe_sleep = 5  # 4 is sometimes not enough
         )
 
         # window name
@@ -49,6 +53,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.is_window_analysis = False
         
         # path
+        self.tmp_dir = tempfile.gettempdir()  # screenshot img for OCR
         self.script_dir = Path(__file__).parent.resolve()
         self.pkg_dir = Path(self.script_dir).parent.resolve()
         self.assets_dir = os.path.join(self.pkg_dir, 'assets')
@@ -196,12 +201,35 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 self.is_window_analysis = True
                 break
 
-        # Todo:
-        # - OCRで残り時間を抽出
+        # OCR setting
         self.make_window_active('測定残り時間')
-        region = (10, 10, 100, 200)  # x,y,w,h
-        screenshot = pyautogui.screenshot(region=region)
-        seconds = self.extract_remaining_time(screenshot)
+        x = self.active_window_x1
+        y = self.active_window_y1
+        w = self.active_window_width
+        h = self.active_window_length
+        region = (x, y, w, h)  # x,y,w,h
+        #self.tmp_dir = tempfile.gettempdir()
+        img_path = os.path.join(self.tmp_dir, 'tmp_ss.png')
+        print('screenshot is saved to: %s'% img_path)
+
+        # OCR
+        seconds = None
+        try:
+            while seconds is None:
+                try:
+                    screenshot = pag.screenshot(region=region)
+                    screenshot.save(img_path)
+                    seconds = self.extract_remaining_time(img_path, debug=True)
+                    time.sleep(2)
+                except Exception as e:
+                    print(e)
+                    print('OCR is not succeeded. Check again in 2 seconds.')
+                    time.sleep(2)
+        except KeyboardInterrupt:
+            print('Ctrl+c')
+        
+        print('OCR succeeded')
+        print('Wait for %s [sec]'% seconds)
         time.sleep(seconds)
 
         # NGB測定 windowで測定完了をチェック
@@ -213,8 +241,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             except KeyboardInterrupt:
                 break
             except:
-                print('Under measurement(NGB window is not found). Check again in 10 seconds.')
-                time.sleep(10)
+                print('Under measurement(NGB window is not found). Check again in 2 seconds.')
+                time.sleep(2)
             else:
                 print('NGB window is closed')
                 print('TMA measurement has finished')
@@ -306,11 +334,11 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         print('End of this measurement')
 
 
-    def extract_remaining_time(self, img_org='/tmp/test_remaining_time.png'):
+    def extract_remaining_time(self, img_org_path, debug=False):
         """
         Extract remaining time for measurement completion with HH:MM:SS format by OCR
         """
-        img = cv2.imread(img_org)
+        img = cv2.imread(img_org_path)
         img_scaled = cv2.resize(img, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)  # scale 3times larger
         img_gray = cv2.cvtColor(img_scaled, cv2.COLOR_BGR2GRAY)  # gray scale
         img_th = cv2.adaptiveThreshold(  # threshold
@@ -320,15 +348,17 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             31, 7
         )
 
-        # show
-        cv2.imshow("gray", img_gray)
-        cv2.imwrite("debug_gray.png", img_gray)
+        if debug:
+            cv2.imshow("gray", img_gray)
+            img_gray_path = os.path.join(self.tmp_dir, 'debug_gray.png')
+            cv2.imwrite(img_gray_path, img_gray)
 
-        cv2.imshow("th", img_th)
-        cv2.imwrite("debug_th.png", img_th)
+            cv2.imshow("th", img_th)
+            img_th_path = os.path.join(self.tmp_dir, 'debug_th.png')
+            cv2.imwrite(img_th_path, img_th)
 
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+            cv2.waitKey(3000)  # wait 3s
+            cv2.destroyAllWindows()
 
         # OCR
         text = pytesseract.image_to_string(img_th, lang='jpn+eng')
@@ -340,24 +370,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         if match:
             h, m, s = map(int, match.groups())
             seconds = h * 3600 + m * 60 + s
-            print(seconds)
+            print('Extract seconds: %s'% seconds)
             return seconds
-
-
-        return None
-
-        #seconds = self.extract_seconds(text)
-        #print(seconds)
-
-
-    def extract_seconds(self, text):
-        '''
-        Extract seconds from OCR text with HH:MM:SS format
-        '''
-        match = re.search(r'(\d+):(\d+):(\d+)', text)
-        if match:
-            h, m, s = map(int, match.groups())
-            return h * 3600 + m * 60 + s
 
         return None
 
@@ -372,14 +386,5 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
 
 if __name__ == "__main__":
     tma_gui_controller = GUIControl_NETZSCH_Measurement()
-    #tma_gui_controller.start_software()
+    tma_gui_controller.start_software()
     #tma_gui_controller.all_process()
-
-
-    #self.make_window_active('測定残り時間')
-    region = (10, 10, 100, 200)  # x,y,w,h
-    screenshot = pag.screenshot(region=region)
-    screenshot.save('/tmp/ss.png')
-    #seconds = self.extract_remaining_time(screenshot)
-    seconds = tma_gui_controller.extract_remaining_time('/tmp/ss.png')
-    #time.sleep(seconds)
