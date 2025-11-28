@@ -23,7 +23,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 #   - set_method():
 #     - メソッド -> メソッドを開く -> メソッドを選択(test.ngb-s-dilなど) -> 開く
 #   - input_parameters():
-#     - ID, 名前,　長さ, 幅, 厚み, 試料の材質, ファイル名を入力 -> OK
+#     - ID, 名前, 長さ, 幅, 厚み, 試料の材質, ファイル名を入力 -> OK
 #   - measure():
 #     - 測定の開始(緑の三角アイコン) -> スタンバイの開始 -> 開始 -> 測定終了を待つ
 #     - 測定が終わると, データ(csvなど)が保存される. 解析ソフトが起動する.
@@ -36,7 +36,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         super().__init__(
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
-            exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}            
+            exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}
             exe_sleep = 5  # 4 is sometimes not enough
         )
 
@@ -51,7 +51,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.is_window_ngb = False
         self.is_window_event_info = False
         self.is_window_analysis = False
-        
+
         # path
         self.tmp_dir = tempfile.gettempdir()  # screenshot img for OCR
         self.script_dir = Path(__file__).parent.resolve()
@@ -74,7 +74,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         # status
         self.NETZSCH_measurement_status = 'waiting'  # waiting, setting, measuring, completed
 
-        
+
     def get_NETZSCH_measurement_status(self):
         return self.NETZSCH_measurement_status
 
@@ -83,11 +83,11 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.execute_application()  # wait exe_sleep time
         self.is_window_main = True
         self.resize_window(self.window_name_main_org, width=600, height=800, x=0, y=0)  # resize window
-        time.sleep(12)  # wait 
-        
-        # find セットポイントwindow and click 'いいえ' 
+        time.sleep(12)  # wait
+
+        # find セットポイントwindow and click 'いいえ'
         self.click_by_pos_on_window('セットポイント', 370, 270, 1)
-                 
+
 
     def set_method(self, method_file_name='test.ngb-s-dil'):
         # initial process
@@ -115,10 +115,10 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                          sample_material  = 'polyethylene',
                          result_file_name = 'test_result'):
         result_file_name_w_id = result_file_name + '_' + str(sample_id)
-        
+
         # input parameters
         #前回の測定の有無で開始点が変わるので注意.
-        #以下は, IDから始まる場合を想定.(基本的にはここから始まる)    
+        #以下は, IDから始まる場合を想定.(基本的にはここから始まる)
         # right top
         pag.write(str(sample_id))
         pag.press('tab')
@@ -219,7 +219,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                     time.sleep(2)
         except KeyboardInterrupt:
             print('Ctrl+c')
-        
+
         print('OCR succeeded')
         print('Wait for %s [sec]'% seconds)
         time.sleep(seconds)
@@ -243,7 +243,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             print('Ctrl+c')
 
         self.NETZSCH_measurement_status = 'completed'
-        
+
 
     # 終了処理
     def close_software(self):
