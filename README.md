@@ -1,16 +1,22 @@
-# netzsch_instrument_ros1
+# netzsch_instrument
+Software for controlling NETZSCH instrument using ROS framework
+
 ## Configuration
 - Server PC (Windows)
   - Measurement software (GUI)
 - Client PC (Ubuntu)
   - Manage auto_exp
-     
+
 ## Install
-Server PC
+### Server PC
+Install python modules
 ```
-# install labauto
-[wsl]
-cd \\wsl.localhost\Ubuntu\home\utokyo-user\catkin_ws\src\labauto
+[powershell]
+cd labautopy
+python3 -m pip install -e .
+
+
+cd netzsch_instrument
 python3 -m pip install -e .
 ```
 
@@ -24,6 +30,11 @@ Install tesseract OCR on Windows
   python3 -m pip install pytesseract
   ```
 
+## Build
+```
+cd ros1
+catkin bt
+```
 
 ## Usage
 client PC

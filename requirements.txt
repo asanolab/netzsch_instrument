@@ -1,2 +1,3 @@
+labauto
 pyautogui
-pygetwindow
+pytesseract
