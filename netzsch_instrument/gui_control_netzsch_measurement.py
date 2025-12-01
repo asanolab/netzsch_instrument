@@ -9,7 +9,7 @@ import re
 import tempfile
 import time
 from pathlib import Path
-from labauto.gui_control.gui_control_windows import GUIControlWindows
+from labautopy.gui_control_windows import GUIControlWindows
 
 # tesseract OCRのpathを指定
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
@@ -37,7 +37,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
             exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}
-            exe_sleep = 5  # 4 is sometimes not enough
+            exe_sleep = 6  # 5 is sometimes not enough
         )
 
         # window name
