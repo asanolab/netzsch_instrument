@@ -9,7 +9,7 @@ import re
 import tempfile
 import time
 from pathlib import Path
-from labauto.gui_control.gui_control_windows import GUIControlWindows
+from labautopy.gui_control_windows import GUIControlWindows
 
 # tesseract OCRのpathを指定
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
