@@ -6,7 +6,7 @@
   <maintainer email="yuki.asano3206@gmail.com">Yuki Asano</maintainer>
   <author email="yuki.asano3206@gmail.com">Yuki Asano</author>
 
-  <license>BSD 2-Clause</license>
+  <license>BSD 3-Clause</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
