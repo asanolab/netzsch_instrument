@@ -37,7 +37,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
             exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}
-            exe_sleep = 6  # 5 is sometimes not enough
+            exe_sleep = 7  # 6 is sometimes not enough
         )
 
         # window name
@@ -48,6 +48,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
 
         # flag
         self.is_window_main = False
+        self.is_window_setpoint = False
         self.is_window_ngb = False
         self.is_window_event_info = False
         self.is_window_analysis = False
@@ -82,11 +83,22 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     def start_software(self):
         self.execute_application()  # wait exe_sleep time
         self.is_window_main = True
+        self.is_window_setpoint = False
         self.resize_window(self.window_name_main_org, width=600, height=800, x=0, y=0)  # resize window
-        time.sleep(12)  # wait
+
+        # wait for setpoint window
+        print('Finding setpoint window')
+        while not self.is_window_setpoint:
+            if self.make_window_active('セットポイント'):
+                self.is_window_setpoint = True
+            else:
+                print('setpoint window is not found. Check again in 2 seconds.')
+                time.sleep(2)
 
         # find セットポイントwindow and click 'いいえ'
         self.click_by_pos_on_window('セットポイント', 370, 270, 1)
+        print('setpoint windows is closed')
+        self.is_window_setpoint = False
 
 
     def set_method(self, method_file_name='test.ngb-s-dil'):
