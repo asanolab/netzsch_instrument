@@ -37,7 +37,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
             exe_cmd = 'start Tam.exe 52 1 4',  # Tam.exe InstrId ChnNo {BusId}
-            exe_sleep = 8  # 7 is sometimes not enough
+            exe_sleep = 3
         )
 
         # window name
@@ -84,7 +84,6 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.execute_application()  # wait exe_sleep time
         self.is_window_main = True
         self.is_window_setpoint = False
-        self.resize_window(self.window_name_main_org, width=600, height=800, x=0, y=0)  # resize window
 
         # wait for setpoint window
         print('Finding setpoint window')
@@ -99,6 +98,9 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.click_by_pos_on_window('セットポイント', 370, 270, 1)
         print('setpoint windows is closed')
         self.is_window_setpoint = False
+
+        # resize window. 処理時間の関係でしばしばスキップしてしまうので最後に置く
+        self.resize_window(self.window_name_main_org, width=600, height=800, x=0, y=0)
 
 
     def set_method(self, method_file_name='test.ngb-s-dil'):
