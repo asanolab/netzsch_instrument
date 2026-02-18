@@ -9,7 +9,7 @@ Software for controlling NETZSCH instrument using ROS framework
 
 ## Install
 ### Server PC
-Install python modules
+**Install python modules**
 ```
 [powershell]
 python3 -m pip install pyautogui
@@ -17,7 +17,25 @@ cd labautopy
 python3 -m pip install -e .
 ```
 
-Install tesseract OCR on Windows
+**netzsch_instrumentへのpythonパスの追加**  
+- 設定ファイルの確認(.bashrcに相当)
+  ```
+  echo $PROFILE
+  -> C:\Users\user\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+  ```
+- ファイルなければ作る
+  ```
+  New-Item -ItemType File -Path $PROFILE -Force
+  ```
+- 中にパスを書く
+  ```
+  $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\netzsch_instrument\src;" + $env:PYTHONPATH
+  的な感じ
+  ```
+- powershellを再起動する
+
+
+**Install tesseract OCR on Windows**
 - Download installer (exe)
   - https://github.com/UB-Mannheim/tesseract/wiki
   - Specify installed application path(exe) in the program
