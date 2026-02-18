@@ -1,16 +1,11 @@
-from setuptools import setup, find_packages
+#! THIS setup.py IS MADE FROM THE TEMPLATE IN THE LINK BELOW
 
+from distutils.core import setup
+from catkin_pkg.python_setup import generate_distutils_setup
 
-def _requires_from_file(filename):
-    return open(filename).read().splitlines()
-
-
-setup(
-    name='netzsch_instrument',
-    version='0.1.0',
-    description='',
-    author='Yuki Asano',
-    author_email='yuki.asano3206@gmail.com',
-    packages=find_packages(),
-    install_requires = _requires_from_file('requirements.txt')
+d = generate_distutils_setup(
+    packages=['netzsch_instrument'],
+    package_dir={'': 'src'}
 )
+
+setup(**d)

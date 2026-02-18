@@ -54,7 +54,7 @@ rospy.init_node("netzsch_measurement_server_mock")
 rospy.Subscriber("/measure_finished", Bool, measure_finished_cb)
 
 # Service server
-service = roslibpy.Service(ros, '/netzsch_measurement_server_mock', 'netzsch_instrument_ros1/NETZSCH_Measurement')
+service = roslibpy.Service(ros, '/netzsch_measurement_server_mock', 'netzsch_instrument/NETZSCH_Measurement')
 service.advertise(handle_netzsch_measurement_mock)
 
 print("[roslibpy] Service '/netzsch_measurement_server_mock' advertised. Waiting for requests...")

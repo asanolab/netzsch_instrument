@@ -12,11 +12,8 @@ Software for controlling NETZSCH instrument using ROS framework
 Install python modules
 ```
 [powershell]
+python3 -m pip install pyautogui
 cd labautopy
-python3 -m pip install -e .
-
-
-cd netzsch_instrument
 python3 -m pip install -e .
 ```
 
@@ -32,7 +29,6 @@ Install tesseract OCR on Windows
 
 ## Build
 ```
-cd ros1
 catkin bt
 ```
 

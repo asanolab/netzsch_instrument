@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(netzsch_instrument_ros1)
-
-#catkin_python_setup()
+project(netzsch_instrument)
 
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
 )
+
+catkin_python_setup()
 
 add_service_files(
   FILES
