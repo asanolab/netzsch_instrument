@@ -13,8 +13,7 @@ Software for controlling NETZSCH instrument using ROS framework
 ```
 [powershell]
 python3 -m pip install pyautogui
-cd labautopy
-python3 -m pip install -e .
+python3 -m pip install pygetwindow
 ```
 
 **netzsch_instrumentへのpythonパスの追加**  
