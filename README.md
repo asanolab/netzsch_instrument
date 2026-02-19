@@ -29,6 +29,7 @@ python3 -m pip install pygetwindow
 - 中にパスを書く
   ```
   $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\netzsch_instrument\src;" + $env:PYTHONPATH
+  $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\gui_control\src;" + $env:PYTHONPATH
   的な感じ
   ```
 - powershellを再起動する
