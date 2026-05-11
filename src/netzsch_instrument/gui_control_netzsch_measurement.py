@@ -32,7 +32,11 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 
 class GUIControl_NETZSCH_Measurement(GUIControlWindows):
-    def __init__(self):
+    def __init__(self, enable_set_point=True, enable_standby=False, enable_auto_analysis=False):
+        # arg:
+        # - enable_set_point: 計測はじめに, セットポイントを開始するかどうか
+        # - enable_standby: メソッドでstandbyが入っているかどうか
+        # - enable_auto_analysis: メソッドで自動解析が入っているかどうか
         super().__init__(
             window_name='TMA 402 F3 Hyperion (1-414/6) ; 測定 - ExpertMode v. 8.0.3',
             exe_dir = 'C:\\Program Files (x86)\\NETZSCH\\Proteus80\\program',
@@ -52,6 +56,9 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.is_window_ngb = False
         self.is_window_event_info = False
         self.is_window_analysis = False
+        self.enable_set_point = enable_set_point
+        self.enable_standby = enable_standby
+        self.enable_auto_analysis = enable_auto_analysis
 
         # path
         self.tmp_dir = tempfile.gettempdir()  # screenshot img for OCR
@@ -85,7 +92,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.is_window_main = True
         self.is_window_setpoint = False
 
-        # wait for setpoint window
+        # wait for setpoint window and click
         print('Finding setpoint window')
         while not self.is_window_setpoint:
             if self.make_window_active('セットポイント'):
@@ -94,8 +101,15 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                 print('setpoint window is not found. Check again in 2 seconds.')
                 time.sleep(2)
 
-        # find セットポイントwindow and click 'いいえ'
-        self.click_by_pos_on_window('セットポイント', 370, 270, 1)
+        if self.enable_set_point:
+            # click 'はい'
+            print('setpoint is enabled')
+            self.click_by_pos_on_window('セットポイント', 300, 270, 1)
+        else: 
+            # click 'いいえ'
+            print('setpoint is disabled')
+            self.click_by_pos_on_window('セットポイント', 370, 270, 1)
+
         print('setpoint windows is closed')
         self.is_window_setpoint = False
 
@@ -186,10 +200,11 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
 
         # 測定アイコンのクリック
         self.click_by_img(self.img_path_start_measure, sleep_time=3)  # must wait for a while (2s is short)
-
-        #「スタンバイの開始」のクリック
         self.make_window_active('TMA 402 F3 Hyperion 調整 (1)')
-        self.click_by_img(self.img_path_standby_TMAsoft)
+
+        # methodにスタンバイが入っている場合, 「スタンバイの開始」をクリック
+        if self.enable_standby:
+            self.click_by_img(self.img_path_standby_TMAsoft)
         # memo:
         # - 装置にエラーがあると測定を開始できない
         # - 例:
@@ -262,6 +277,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
     # 終了処理
     def close_software(self):
         # イベント情報window close
+        # 出るときと出ない時がある.出るまでに時間がかかる.出ていない場合はスキップ
         try:
             while self.is_window_event_info:
                 try:
@@ -271,8 +287,8 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                     self.click_by_img(self.img_path_event_info_OK)
                 except Exception as e:
                     print(e)
-                    print('event_info is not found. Check again in 2 seconds.')
-                    time.sleep(2)
+                    print('event_info is not found.')
+                    self.is_window_event_info = False
                 else:
                     print('event_info windows is closed')
                     self.is_window_event_info = False
@@ -300,7 +316,10 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         except KeyboardInterrupt:
             print('Ctrl+c')
 
-        # NGB測定 close
+        # NGB測定画面 close.
+        # main画面を閉じたときに,セットポイントの継続確認として出る.
+        # はい   -> setpointが継続し、ソフトもバックグラウンドで残る
+        # いいえ -> setpointを停止し、ソフトも停止
         try:
             while self.is_window_ngb:
                 try:
@@ -319,28 +338,33 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         except KeyboardInterrupt:
             print('Ctrl+c')
 
-        # analysis soft close
-        try:
-            while self.is_window_analysis:
-                try:
-                    print('Closing analysis window')
-                    # memo & todo:
-                    # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
-                    # - imgからだと誤認識があるので, window名が取得できるなら,そこからcloseできたほうがよい.
-                    #self.make_window_active(self.window_name_analysis)
-                    #time.sleep(1)
-                    #self.close_active_window()
-                    self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでimgからでも誤認識が起きにくく,ひとまず問題ない.
-                except Exception as e:
-                    print(e)
-                    print('Analysis window is not found. Check again in 2 seconds.')
-                    time.sleep(2)
-                else:
-                    print('Analysis windows is closed')
-                    self.is_window_analysis = False
-                    time.sleep(1)
-        except KeyboardInterrupt:
-            print('Ctrl+c')
+        # 自動解析がonの時に出現するwindowを閉じる
+        if self.enable_auto_analysis:
+            # analysis soft close
+            print('Closing analysis windows')
+            try:
+                while self.is_window_analysis:
+                    try:
+                        print('Closing analysis window')
+                        # memo & todo:
+                        # - window名が既存のファイルがあると#nで増分していくのでどうするべきか.
+                        # - imgからだと誤認識があるので, window名が取得できるなら,そこからcloseできたほうがよい.
+                        #self.make_window_active(self.window_name_analysis)
+                        #time.sleep(1)
+                        #self.close_active_window()
+                        self.click_by_img(self.img_path_analysis_window_close)  # このwindowを閉じるのが最後なのでimgからでも誤認識が起きにくく,ひとまず問題ない.
+                    except Exception as e:
+                        print(e)
+                        print('Analysis window is not found. Check again in 2 seconds.')
+                        time.sleep(2)
+                    else:
+                        print('Analysis windows is closed')
+                        self.is_window_analysis = False
+                        time.sleep(1)
+            except KeyboardInterrupt:
+                print('Ctrl+c')
+        else:
+            print('Skip closing auto analysis windows')
 
         print('End of this measurement')
 
