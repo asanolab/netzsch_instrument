@@ -221,7 +221,6 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                     print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft)
                     time.sleep(10)
                 else:
-                    print('TMA measurement has started')
                     #測定完了後は, main画面に加えて, NGB測定, イベント情報, 分析ソフトのwindowが立ち上がる.
                     self.is_window_ngb = True
                     self.is_window_event_info = True
@@ -229,6 +228,23 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                     break
         except KeyboardInterrupt:
             print('Ctrl+c')
+
+        # 温度が設定温度に十分に近くないと測定が開始しない
+        if self.make_window_active('TMA 402 F3 Hyperion 調整 (1)'):
+            print('TMA 402 F3 Hyperion 調整 (1) is still exist')
+            while True:
+                try:
+                    self.click_by_img(self.img_path_start_TMAsoft)
+                except Exception as e:
+                    print(e)
+                    print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft)
+                    time.sleep(10)
+                else:
+                    print('TMA measurement has started')
+                    break
+        else:
+            print('TMA measurement has started')
+
 
         # OCR setting
         ss_path = os.path.join(self.tmp_dir, 'tmp_ss.png')
