@@ -32,7 +32,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 
 class GUIControl_NETZSCH_Measurement(GUIControlWindows):
-    def __init__(self, enable_set_point=True, enable_standby=False, enable_auto_analysis=False):
+    def __init__(self, enable_set_point=True, enable_standby=False, enable_auto_analysis=True):
         # arg:
         # - enable_set_point: 計測はじめに, セットポイントを開始するかどうか
         # - enable_standby: メソッドでstandbyが入っているかどうか
