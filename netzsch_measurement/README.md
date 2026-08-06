@@ -64,7 +64,7 @@ roscore
 
 [terminal2] powershell
 cd \\wsl.localhost\Ubuntu
-cd 'path_to_pkg'\netzsch_ros\scripts_powershell
+cd 'path_to_pkg'\netzsch_measurement\scripts
 python3 .\netzsch_measurement_server.py ..\config\netzsch_measurement_config.yaml
 
 
