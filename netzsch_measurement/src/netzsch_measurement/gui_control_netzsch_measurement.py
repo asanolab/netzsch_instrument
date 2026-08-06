@@ -32,7 +32,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 
 
 class GUIControl_NETZSCH_Measurement(GUIControlWindows):
-    def __init__(self, enable_set_point=True, enable_standby=False, enable_auto_analysis=False):
+    def __init__(self, enable_set_point=True, enable_standby=False, enable_auto_analysis=True):
         # arg:
         # - enable_set_point: 計測はじめに, セットポイントを開始するかどうか
         # - enable_standby: メソッドでstandbyが入っているかどうか
@@ -73,6 +73,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.img_path_start_measure     = os.path.join(self.assets_dir, 'icon_start_measure.png')
         self.img_path_standby_TMAsoft   = os.path.join(self.assets_dir, 'Adjustment_standby_start.png')
         self.img_path_start_TMAsoft     = os.path.join(self.assets_dir, 'Adjustment_start.png')
+        self.img_path_start_TMAsoft_2   = os.path.join(self.assets_dir, 'Adjustment_start_2.png')
         self.img_path_finish_measure_OK = os.path.join(self.assets_dir, 'NGB_OK.png')
         self.img_path_event_info_OK     = os.path.join(self.assets_dir, 'EventInfo_OK.png')
         self.img_path_analysis_window_close = os.path.join(self.assets_dir, 'analysis_window_close.png')
@@ -193,6 +194,7 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
         self.window_name_main = self.window_name_main_org + ' - ' + result_file_name_w_id + '.ngb-sl8'
         self.window_name_analysis = 'NETZSCH Proteus Thermal Analysis (Automatic instance) 8.0.3 - [' + result_file_name_w_id + '.ngb-ol8]'
         print('window name updated to: %s'% self.window_name_main)
+        print('\n')
 
 
     def measure(self):
@@ -225,25 +227,28 @@ class GUIControl_NETZSCH_Measurement(GUIControlWindows):
                     self.is_window_ngb = True
                     self.is_window_event_info = True
                     self.is_window_analysis = True
+                    print('Clicked 開始 button first')
                     break
         except KeyboardInterrupt:
             print('Ctrl+c')
 
         # 温度が設定温度に十分に近くないと測定が開始しない
+        pag.moveTo(10, 10, 1)  # カーソルがボタンに被るのでいったん原点付近に移動
         if self.make_window_active('TMA 402 F3 Hyperion 調整 (1)'):
             print('TMA 402 F3 Hyperion 調整 (1) is still exist')
             while True:
                 try:
-                    self.click_by_img(self.img_path_start_TMAsoft)
+                    self.click_by_img(self.img_path_start_TMAsoft_2)
                 except Exception as e:
                     print(e)
-                    print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft)
+                    print('Image might not found. Check again in 10 seconds. ->', self.img_path_start_TMAsoft_2)
                     time.sleep(10)
                 else:
-                    print('TMA measurement has started')
+                    print('Clicked 開始 button second')
+                    print('TMA measurement has started\n')
                     break
         else:
-            print('TMA measurement has started')
+            print('TMA measurement has started\n')
 
 
         # OCR setting
