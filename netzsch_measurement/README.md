@@ -1,5 +1,5 @@
-# netzsch_instrument
-Software for controlling NETZSCH instrument using ROS framework
+# netzsch_measurement
+Software for controlling NETZSCH measurement using ROS framework
 
 ## Configuration
 - Server PC (Windows)
@@ -17,7 +17,7 @@ python3 -m pip install pygetwindow
 ```
 
 **pythonパスを通す**  
-netzsch_instrumentとgui_controlをimportするために必要
+netzsch_measurementとgui_controlをimportするために必要
 - 設定ファイルの確認(.bashrcに相当)
   ```
   echo $PROFILE
@@ -29,7 +29,7 @@ netzsch_instrumentとgui_controlをimportするために必要
   ```
 - 中にパスを書く. 
   ```
-  $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\netzsch_instrument\src;" + $env:PYTHONPATH
+  $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\netzsch_instrument\netzsch_measurement\src;" + $env:PYTHONPATH
   $env:PYTHONPATH = "\\wsl.localhost\Ubuntu\home\user\catkin_ws\gui_control\src;" + $env:PYTHONPATH
   的な感じ
   ```

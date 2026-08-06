@@ -4,7 +4,7 @@ from distutils.core import setup
 from catkin_pkg.python_setup import generate_distutils_setup
 
 d = generate_distutils_setup(
-    packages=['netzsch_instrument'],
+    packages=['netzsch_measurement'],
     package_dir={'': 'src'}
 )
 

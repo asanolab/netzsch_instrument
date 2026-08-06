@@ -1,5 +1,5 @@
 <package format="2">
-  <name>netzsch_instrument</name>
+  <name>netzsch_measurement</name>
   <version>0.1.0</version>
   <description> NETZSCH software controller using ROS </description>
 
