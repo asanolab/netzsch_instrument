@@ -1,0 +1,16 @@
+<package format="2">
+  <name>netzsch_tma402f3</name>
+  <version>0.1.0</version>
+  <description> NETZSCH TMA402F3 controller </description>
+
+  <maintainer email="yuki.asano3206@gmail.com">Yuki Asano</maintainer>
+  <author email="yuki.asano3206@gmail.com">Yuki Asano</author>
+
+  <license>BSD 3-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+
+</package>
