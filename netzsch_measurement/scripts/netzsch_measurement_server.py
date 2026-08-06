@@ -6,7 +6,7 @@ import roslibpy
 import sys
 import time
 import yaml
-from netzsch_instrument.gui_control_netzsch_measurement import GUIControl_NETZSCH_Measurement
+from netzsch_measurement.gui_control_netzsch_measurement import GUIControl_NETZSCH_Measurement
 
 tma_gui_controller = GUIControl_NETZSCH_Measurement(enable_set_point=True, enable_standby=False, enable_auto_analysis=True)
 
@@ -110,7 +110,7 @@ ros = roslibpy.Ros(host=client_ip, port=client_port)
 ros.run()
 
 # Service server
-service = roslibpy.Service(ros, '/netzsch_measurement_server', 'netzsch_instrument/NETZSCH_Measurement')
+service = roslibpy.Service(ros, '/netzsch_measurement_server', 'netzsch_measurement/NETZSCH_Measurement')
 service.advertise(handle_netzsch_measurement)
 
 print("[roslibpy] Service '/netzsch_measurement_server' advertised. Waiting for requests...")

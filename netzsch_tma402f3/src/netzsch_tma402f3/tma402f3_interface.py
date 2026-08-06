@@ -15,7 +15,6 @@ import os
 import sys
 import time
 import yaml
-import netzsch_instrument
 from plcpy.plc_interface_keyence import PLCInterfaceKeyence
 
 src_file_dir = os.path.dirname(os.path.abspath(__file__))
