@@ -15,7 +15,7 @@ import os
 import sys
 import time
 import yaml
-from plcpy.plc_interface_keyence import PLCInterfaceKeyence
+from plc_interface.keyence import PLCInterfaceKeyence
 
 src_file_dir = os.path.dirname(os.path.abspath(__file__))
 pkg_dir = os.path.join(src_file_dir, '../..')
