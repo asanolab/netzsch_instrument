@@ -21,7 +21,7 @@ netzsch_measurementとgui_controlをimportするために必要
 - 設定ファイルの確認(.bashrcに相当)
   ```
   echo $PROFILE
-  -> C:\Users\user\Documents\PowerShell\Microsoft.PowerShell_profile.ps1
+  -> C:\Users\user\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
   ```
 - ファイルなければ作る
   ```
@@ -64,7 +64,7 @@ roscore
 
 [terminal2] powershell
 cd \\wsl.localhost\Ubuntu
-cd 'path_to_pkg'\netzsch_ros\scripts_powershell
+cd 'path_to_pkg'\netzsch_measurement\scripts
 python3 .\netzsch_measurement_server.py ..\config\netzsch_measurement_config.yaml
 
 
